@@ -5,10 +5,11 @@
 
 
 #include <stdint.h>
+#include <stdio.h>
 
 
 
-typedef int TUI_Symbol;
+typedef char TUI_Symbol;
 
 
 typedef enum TUI_ColorFormat : int8_t {
@@ -30,23 +31,23 @@ typedef enum TUI_ColorFormat : int8_t {
 
 typedef enum TUI_Color16 : int8_t {
         
-        Color_BLack   = 0,
-        Color_Red     = 1,
-        Color_Green   = 2,
-        Color_Yellow  = 3,
-        Color_Blue    = 4,
-        Color_Magenta = 5,
-        Color_Cyan    = 6,
-        Color_White   = 7,
+        Color_BLack   = 30,
+        Color_Red     = 31,
+        Color_Green   = 32,
+        Color_Yellow  = 33,
+        Color_Blue    = 34,
+        Color_Magenta = 35,
+        Color_Cyan    = 36,
+        Color_White   = 37,
 
-        Color_BrightBLack   = 8,
-        Color_BrightRed     = 9,
-        Color_BrightGreen   = 10,
-        Color_BrightYellow  = 11,
-        Color_BrightBlue    = 12,
-        Color_BrightMagenta = 13,
-        Color_BrightCyan    = 14,
-        Color_BrightWhite   = 15,
+        Color_BrightBLack   = 90,
+        Color_BrightRed     = 91,
+        Color_BrightGreen   = 92,
+        Color_BrightYellow  = 93,
+        Color_BrightBlue    = 94,
+        Color_BrightMagenta = 95,
+        Color_BrightCyan    = 96,
+        Color_BrightWhite   = 97,
         
 } TUI_Color16;
 
@@ -54,8 +55,8 @@ typedef enum TUI_Color16 : int8_t {
 
 
 typedef struct TUI_SColor16 {
-        TUI_Color16 fg: 4;
-        TUI_Color16 bg: 4;
+        TUI_Color16 fg;
+        TUI_Color16 bg;
 } TUI_SColor16;
 
 
@@ -100,8 +101,9 @@ typedef union TUI_UniColor {
 
 
 typedef struct TUI_UniSColor {
-        TUI_UniColor fg;
-        TUI_UniColor bg;
+        TUI_SColorRGB cfRGB;
+        TUI_SColor256 cf256;
+        TUI_SColor16 cf16;
 } TUI_UniSColor;
 
 
@@ -122,6 +124,13 @@ int TUI_GetSColorSize(TUI_ColorFormat _Format);
 
 // TUI_Color16 TUI_TransformColorRGB_16(TUI_ColorRGB _Color);
 // TUI_Color256 TUI_TransformColorRGB_256(TUI_ColorRGB _Color);
+
+
+int __TUI_PrintColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
+
+int __TUI_PrintSColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
+
+int TUI_PrintSColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
 
 
 #endif // __TUI_Symbols_h__

@@ -36,7 +36,7 @@ typedef struct TUI_Renderer {
 
 
 
-TUI_Renderer *TUI_CreateRenderer(FILE *_Stream, uint32_t _Width, uint32_t _Height, TUI_ColorFormat _Format);
+TUI_Renderer *TUI_RendererCreate(FILE *_Stream, uint32_t _Width, uint32_t _Height, TUI_ColorFormat _Format);
 
 
 
@@ -47,7 +47,7 @@ bool TUI_RendererPresent(TUI_Renderer *_Renderer);
 bool TUI_RendererClear(TUI_Renderer *_Renderer);
 
 
-bool TUI_ResizeRenderer(TUI_Renderer *_Renderer, uint32_t _Width, uint32_t _Height);
+bool TUI_RendererResize(TUI_Renderer *_Renderer, uint32_t _Width, uint32_t _Height);
 
 
 

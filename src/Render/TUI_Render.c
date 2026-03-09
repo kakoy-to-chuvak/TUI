@@ -25,7 +25,7 @@ void __memsetXX(void *_Buffer, void *_Value, size_t _Value_size, size_t _Count) 
 
 
 
-TUI_Renderer *TUI_CreateRenderer(FILE *_Stream, uint32_t _Width, uint32_t _Height, TUI_ColorFormat _Format) {
+TUI_Renderer *TUI_RendererCreate(FILE *_Stream, uint32_t _Width, uint32_t _Height, TUI_ColorFormat _Format) {
         if ( _Stream == NULL || _Format == ColorFormat_Undefined ) {
                 return NULL;
         }
@@ -38,7 +38,7 @@ TUI_Renderer *TUI_CreateRenderer(FILE *_Stream, uint32_t _Width, uint32_t _Heigh
         
         uint32_t symbols_count = _Width * _Height;
 
-        renderer->symbols = malloc( symbols_count * sizeof(TUI_Symbol) );
+        renderer->symbols = calloc(symbols_count, sizeof(TUI_Symbol));
         if ( renderer->symbols == NULL ) {
                 TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
                 
@@ -48,7 +48,7 @@ TUI_Renderer *TUI_CreateRenderer(FILE *_Stream, uint32_t _Width, uint32_t _Heigh
 
         renderer->color_size = TUI_GetSColorSize(_Format);
 
-        renderer->colors = malloc(symbols_count * renderer->color_size);
+        renderer->colors = calloc(symbols_count, renderer->color_size);
         if ( renderer->colors == NULL ) {
                 TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
                 
@@ -79,29 +79,48 @@ bool TUI_RendererPresent(TUI_Renderer *_Renderer) {
 
         uint32_t count = _Renderer->symbols_count; 
         TUI_Symbol *now_symbol = _Renderer->symbols;
-        void *now_color = _Renderer->colors;
-        int color_size = _Renderer->color_size;
 
         uint32_t now_width = _Renderer->width;
+        int color_size = TUI_GetColorSize(_Renderer->color_format);
 
-        fputs("\x1b[2J\x1b[H", _Renderer->stream);
+        void *now_fg_color = _Renderer->colors;
+        void *now_bg_color = (void*)((char*)now_fg_color + color_size);
+
+        TUI_UniColor prev_fg_color;
+        TUI_UniColor prev_bg_color;
+
+        prev_fg_color.cfRGB = ((TUI_ColorRGB){0, 0, 0});
+        prev_bg_color.cfRGB = ((TUI_ColorRGB){0, 0, 0});
+
+        fputs("\033c", _Renderer->stream);
 
         while ( count ) {
-                TUI_PrintSColor(now_color, _Renderer->color_format, _Renderer->stream);
-                fputc(*now_symbol, _Renderer->stream);
-
-                now_width--;
                 if ( now_width == 0 ) {
                         now_width = _Renderer->width;
                         fputc('\n', _Renderer->stream);
+                        
+                }
+                now_width--;
 
+                if ( memcmp(&prev_bg_color, now_bg_color, color_size) ) {
+                        TUI_PrintBgColor(now_bg_color, _Renderer->color_format, _Renderer->stream);
+                        memcpy(&prev_bg_color, now_bg_color, color_size);
                 }
 
+                if ( memcmp(&prev_fg_color, now_fg_color, color_size) ) { 
+                        TUI_PrintFgColor(now_fg_color, _Renderer->color_format, _Renderer->stream);
+                        memcpy(&prev_fg_color, now_fg_color, color_size);
+                }
+
+
+                fputc(*now_symbol, _Renderer->stream);
+                
+
                 now_symbol++;
-                now_color = (char*)now_color + color_size;
+                now_fg_color = (char*)now_fg_color + color_size * 2;
+                now_bg_color = (char*)now_bg_color + color_size * 2;
                 count--;
         }
-        // доделать
 
         return 1;
 }
@@ -124,9 +143,7 @@ bool TUI_RendererClear(TUI_Renderer *_Renderer){
 
 
 
-
-
-bool TUI_ResizeRenderer(TUI_Renderer *_Renderer, uint32_t _Width, uint32_t _Height) {
+bool TUI_RendererResize(TUI_Renderer *_Renderer, uint32_t _Width, uint32_t _Height) {
         if ( _Renderer == NULL || _Renderer->symbols == NULL || _Renderer->colors == NULL) {
                 return 0;
         }
@@ -141,19 +158,16 @@ bool TUI_ResizeRenderer(TUI_Renderer *_Renderer, uint32_t _Width, uint32_t _Heig
 
         _Renderer->symbols = new_symbols;
 
-        void *new_colors;
         if ( _Renderer->color_size ) {
-                 new_colors = realloc( _Renderer->colors, new_count * _Renderer->color_size );
-        } else {
-                new_colors = _Renderer->colors;
-        }
+                void *new_colors = realloc( _Renderer->colors, new_count * _Renderer->color_size );
 
-        if ( new_colors == NULL ) {
-                TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
-                return 0;  
+                if ( new_colors == NULL ) {
+                        TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
+                        return 0;  
+                }
+                _Renderer->colors = new_colors;
         }
-
-        _Renderer->colors = new_colors;
+        
 
         _Renderer->width = _Width;
         _Renderer->height = _Height;

@@ -30,10 +30,11 @@ $(BUILD_DIR)/$(RES_LIB): $(O_FILES)
 $(O_FILES): $(SRCS)
 	@echo Compiling .o files...
 	gcc -c $(SRCS) -I $(INCLUDE_DIR) $(CC_FLAGS)
-	
 
 
-tests: $(BUILD_DIR)/$(RES_LIB)
+tests: 
 	gcc $(TESTS_DIR)/renderer.c -o $(BUILD_DIR)/tests/renderer -I $(INCLUDE_DIR) -L $(BUILD_DIR) -llogs
+	gcc $(TESTS_DIR)/color.c -o $(BUILD_DIR)/tests/color -I $(INCLUDE_DIR) -L $(BUILD_DIR) -llogs
 
-.PHONY: all tests
+
+.PHONY: tests

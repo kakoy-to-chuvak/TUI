@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <math.h>
+
 
 
 
@@ -100,7 +102,7 @@ typedef union TUI_UniColor {
 
 
 
-typedef struct TUI_UniSColor {
+typedef union TUI_UniSColor {
         TUI_SColorRGB cfRGB;
         TUI_SColor256 cf256;
         TUI_SColor16 cf16;
@@ -114,21 +116,24 @@ int TUI_GetColorSize(TUI_ColorFormat _Format);
 int TUI_GetSColorSize(TUI_ColorFormat _Format);
 
 
-// TUI_Color256 TUI_TransformColor16_256(TUI_Color16 _Color);
-// TUI_ColorRGB TUI_TransformColor16_RGB(TUI_Color16 _Color);
+TUI_Color256 TUI_TransformColor16_256(TUI_Color16 _Color);
+
+TUI_ColorRGB TUI_TransformColor16_RGB(TUI_Color16 _Color);
 
 
-// TUI_Color16 TUI_TransformColor256_16(TUI_Color256 _Color);
-// TUI_ColorRGB TUI_TransformColor256_RGB(TUI_Color256 _Color);
+TUI_Color16 TUI_TransformColor256_16(TUI_Color256 _Color);
+
+TUI_ColorRGB TUI_TransformColor256_RGB(TUI_Color256 _Color);
 
 
-// TUI_Color16 TUI_TransformColorRGB_16(TUI_ColorRGB _Color);
-// TUI_Color256 TUI_TransformColorRGB_256(TUI_ColorRGB _Color);
+TUI_Color16 TUI_TransformColorRGB_16(TUI_ColorRGB _Color);
+
+TUI_Color256 TUI_TransformColorRGB_256(TUI_ColorRGB _Color);
 
 
-int __TUI_PrintColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
+int TUI_PrintFgColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
 
-int __TUI_PrintSColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
+int TUI_PrintBgColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
 
 int TUI_PrintSColor(void *_Color, TUI_ColorFormat _Format, FILE *_Stream);
 

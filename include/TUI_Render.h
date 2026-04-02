@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-
+#include <stdbool.h>
 
 
 #include "TUI_Symbols.h"

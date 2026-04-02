@@ -1,7 +1,7 @@
 #include "TUI_Render.h"
 
 #include <time.h>
-
+#include <synchapi.h>
 
 
 void TestColor256(TUI_Color256 color256) {
@@ -9,11 +9,11 @@ void TestColor256(TUI_Color256 color256) {
         TUI_ColorRGB colorRGB = TUI_TransformColor256_RGB(color256);
 
         TUI_PrintBgColor(&color256, ColorFormat_256, stdout);
-        printf("    ");
+        printf("    ", color256);
         TUI_PrintBgColor(&colorRGB, ColorFormat_RGB, stdout);
         printf("    ");
         TUI_PrintBgColor(&color16, ColorFormat_16, stdout);
-        printf("    \x1b[49m");
+        printf("    \x1b[49m", color16);
 }
 
 void TestColor16(TUI_Color16 color16) {

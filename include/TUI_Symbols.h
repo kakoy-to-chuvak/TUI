@@ -14,7 +14,7 @@
 typedef char TUI_Symbol;
 
 
-typedef enum {
+typedef enum TUI_ColorFormat : int8_t {
         
         ColorFormat_Undefined = -1,
 
@@ -31,7 +31,7 @@ typedef enum {
 
 
 
-typedef enum {
+typedef enum TUI_Color16 : int8_t {
         
         Color_BLack   = 30,
         Color_Red     = 31,

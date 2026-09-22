@@ -1,0 +1,4 @@
+-DMY_MACRO=1
+-I/usr/include/boost
+-I/home/kto-to/projects/TUI/include
+-I/home/kto-to/projects/TUI/src

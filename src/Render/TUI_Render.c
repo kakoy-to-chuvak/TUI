@@ -1,5 +1,6 @@
 #include "TUI_Render.h"
 #include "TUI_Symbols.h"
+#include "TUI_Error.h"
 
 #define __MIN(a, b) ( a > b ? b : a )
 #define __RGB_BLACK ((TUI_ColorRGB){0, 0, 0})
@@ -7,13 +8,13 @@
 
 
 void __memset32(void *_Buffer, int32_t _Value, size_t _Count) {
-    uint32_t *buf = _Buffer;
+    uint32_t *buf = (uint32_t*)_Buffer;
 
     while(_Count--) *buf++ = _Value;
 }
 
 void __memsetXX(void *_Buffer, void *_Value, size_t _Value_size, size_t _Count) {
-    char *buf = _Buffer;
+    char *buf = (char*)_Buffer;
 
     while(_Count--)
     {
@@ -30,7 +31,7 @@ TUI_Renderer *TUI_RendererCreate(FILE *_Stream, uint32_t _Width, uint32_t _Heigh
                 return NULL;
         }
 
-        TUI_Renderer *renderer = malloc(sizeof(TUI_Renderer));
+        TUI_Renderer *renderer = (TUI_Renderer*)malloc(sizeof(TUI_Renderer));
         if ( renderer == NULL ) {
                 TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
                 return NULL;
@@ -38,7 +39,7 @@ TUI_Renderer *TUI_RendererCreate(FILE *_Stream, uint32_t _Width, uint32_t _Heigh
         
         uint32_t symbols_count = _Width * _Height;
 
-        renderer->symbols = calloc(symbols_count, sizeof(TUI_Symbol));
+        renderer->symbols = (TUI_Symbol*)calloc(symbols_count, sizeof(TUI_Symbol));
         if ( renderer->symbols == NULL ) {
                 TUI_SetError(TUI_ErrType_AllocationError, "couldn`t allocate memory");
                 

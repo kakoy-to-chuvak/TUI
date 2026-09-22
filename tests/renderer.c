@@ -1,7 +1,6 @@
 #include "TUI_Render.h"
 
 #include <time.h>
-#include <synchapi.h>
 
 
 

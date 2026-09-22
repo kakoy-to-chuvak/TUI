@@ -4,37 +4,36 @@ TESTS_DIR=tests
 INCLUDE_DIR=include
 
 TUI_LIBS=TUI_Error TUI_Symbols TUI_Render
-RES_LIB=liblogs.a
+RES_LIB=libtui.a
 
+CC=gcc
 CC_FLAGS=-Wall -Wextra -Werror -Wno-alloc-size -Wpedantic
 
-
-
-
-
-O_FILES=$(TUI_LIBS:%=%.o)
-SRC_FILES=$(TUI_LIBS:TUI_%=$(SRC_DIR)/%/*.c)
-SRCS=$(foreach _src,$(SRC_FILES),$(wildcard $(_src)))
-
+O_FILES=$(TUI_LIBS:%=$(BUILD_DIR)/%.o)
 
 all: $(BUILD_DIR)/$(RES_LIB)
 
+$(BUILD_DIR):
+	mkdir -p $@
 
+define BUILD_OBJECT
+$(BUILD_DIR)/$(1).o: $(SRC_DIR)/$(patsubst TUI_%,%,$(1))/$(1).c | $(BUILD_DIR)
+	$(CC) -c $$< -o $$@ -I $(INCLUDE_DIR) $(CC_FLAGS) -MMD -MP
+endef
+
+$(foreach _lib,$(TUI_LIBS),$(eval $(call BUILD_OBJECT,$(_lib))))
 
 $(BUILD_DIR)/$(RES_LIB): $(O_FILES)
-	ar rcs $(BUILD_DIR)/$(RES_LIB) TUI_Error.o TUI_Symbols.o TUI_Render.o
-	@echo Cleaning garbage...
-	del $(O_FILES)
+	ar rcs $@ $(O_FILES)
 
+tests: $(BUILD_DIR)/$(RES_LIB)
+	mkdir -p $(BUILD_DIR)/tests
+	$(CC) $(TESTS_DIR)/renderer.c -o $(BUILD_DIR)/tests/renderer -I $(INCLUDE_DIR) -L $(BUILD_DIR) -ltui -lm
+	$(CC) $(TESTS_DIR)/color.c -o $(BUILD_DIR)/tests/color -I $(INCLUDE_DIR) -L $(BUILD_DIR) -ltui -lm
 
-$(O_FILES): $(SRCS)
-	@echo Compiling .o files...
-	gcc -c $(SRCS) -I $(INCLUDE_DIR) $(CC_FLAGS)
+clean:
+	rm -rf $(BUILD_DIR)
 
+-include $(O_FILES:.o=.d)
 
-tests: 
-	gcc $(TESTS_DIR)/renderer.c -o $(BUILD_DIR)/tests/renderer -I $(INCLUDE_DIR) -L $(BUILD_DIR) -llogs
-	gcc $(TESTS_DIR)/color.c -o $(BUILD_DIR)/tests/color -I $(INCLUDE_DIR) -L $(BUILD_DIR) -llogs
-
-
-.PHONY: tests
+.PHONY: all tests clean

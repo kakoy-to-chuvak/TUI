@@ -166,8 +166,8 @@ TUI_Color16 TUI_TransformColor256_16(TUI_Color256 _Color) {
 
         if ( _Color < 232 ) {
                 _Color -= 16;
-                r = ( _Color / 36 ) / 5.0;
-                g = ( ( _Color % 36 ) / 6 ) / 5.0;
+                r = ( (float)_Color / 36.0 ) / 5.0;
+                g = ( (float)( _Color % 36 ) / 6.0 ) / 5.0;
                 b = ( _Color % 6 ) / 5.0;
         } else {
                 r = ( ( ( _Color - 232) * 10) + 8 ) / 255.0;
